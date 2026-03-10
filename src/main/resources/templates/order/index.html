@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Objednávkový Panel - Brainrot Food</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .container { display: flex; gap: 20px; }
+        .products { flex: 2; }
+        .cart { flex: 1; border: 2px solid #333; padding: 15px; }
+        .product-card { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        .btn { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; border: none; }
+        .btn-danger { background: #dc3545; color: white; border: none; }
+        .btn-success { background: #28a745; color: white; border: none; }
+    </style>
+</head>
+<body>
+<h1>🍔 Objednávkový Panel</h1>
+
+<div class="container">
+    <!-- Produkty -->
+    <div class="products">
+        <h2>Menu</h2>
+        <div th:each="category : ${categories}">
+            <h3 th:text="${category.name}"></h3>
+
+            <div th:each="item : ${allItems}"
+                 th:if="${item.category.id == category.id}"
+                 class="product-card">
+
+                <h4 th:text="${item.name}"></h4>
+                <p th:text="'Cena: ' + ${item.price} + ' Kč'"></p>
+
+                <form th:action="@{/order/add}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.id}"/>
+
+                    <label>Počet:</label>
+                    <input type="number" name="count" value="1" min="1" max="10"/>
+
+                    <div>
+                        <label>Přílohy:</label>
+                        <div th:each="changeable : ${changeables}">
+                            <input type="checkbox" name="changeableIds"
+                                   th:value="${changeable.id}"/>
+                            <span th:text="${changeable.name} + ' (+' + ${changeable.price} + ' Kč)'"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Přidat do košíku
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Košík -->
+    <div class="cart">
+        <h2>🛒 Košík</h2>
+
+        <div th:if="${cart.items.isEmpty()}">
+            <p>Košík je prázdný</p>
+        </div>
+
+        <div th:unless="${cart.items.isEmpty()}">
+            <div th:each="item, iterStat : ${cart.items}" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                <strong th:text="${item.count} + 'x ' + ${item.product.name}"></strong>
+                <div th:if="${!item.selectedChangeables.isEmpty()}">
+                    <small>Přílohy:</small>
+                    <div th:each="ch : ${item.selectedChangeables}">
+                        <small th:text="'+ ' + ${ch.name}"></small>
+                    </div>
+                </div>
+                <p th:text="'Cena: ' + ${item.totalPrice} + ' Kč'"></p>
+
+                <form th:action="@{/order/remove/{index}(index=${iterStat.index})}"
+                      method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Odebrat</button>
+                </form>
+            </div>
+
+            <h3 th:text="'Celkem: ' + ${cart.totalPrice} + ' Kč'"></h3>
+
+            <form th:action="@{/order/complete}" method="post">
+                <button type="submit" class="btn btn-success">
+                    Dokončit objednávku
+                </button>
+            </form>
+
+            <form th:action="@{/order/cancel}" method="post">
+                <button type="submit" class="btn btn-danger">
+                    Zrušit objednávku
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Objednávka dokončena</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; }
+        .success { color: green; font-size: 24px; }
+    </style>
+</head>
+<body>
+<h1 class="success">✅ Objednávka dokončena!</h1>
+
+<p th:text="'Číslo objednávky: ' + ${order.id}"></p>
+<p th:text="'Celková cena: ' + ${order.price} + ' Kč'"></p>
+<p th:text="'Účtenka uložena do: ' + ${receiptPath}"></p>
+
+<h2>💳 Simulace platby</h2>
+<p>Platba proběhla úspěšně!</p>
+
+<a href="/templates/orderates/order">← Zpět na objednávání</a>
+</body>
+</html>
